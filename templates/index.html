@@ -11,10 +11,12 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  {% include "_nav.html" %}
   <main class="page">
-    <p class="eyebrow">A calmer way to start</p>
+    <p class="eyebrow">{% if current_user %}Hello, {{ current_user }}{% else %}A calmer way to start{% endif %}</p>
     <h1>Stop Procrastination</h1>
     <p class="lede">Tell the truth about the task you keep putting off. We'll turn that into a plan small enough to begin.</p>
+    <p class="cross-link"><a href="{{ url_for('timer') }}">Or start a focus timer</a></p>
 
     <form method="post" action="#" class="panel">
       <div class="field">
@@ -78,6 +80,9 @@
       </div>
 
       <button id="start-task" type="submit" class="submit">Help Me Understand My Procrastination</button>
+      {% if not current_user %}
+        <p class="hint stay-note">Log in if you want this task saved to a profile.</p>
+      {% endif %}
     </form>
   </main>
 </body>

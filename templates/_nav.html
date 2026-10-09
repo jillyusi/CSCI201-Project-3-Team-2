@@ -1,0 +1,15 @@
+<header class="site-nav">
+  <a class="brand" href="{{ url_for('index') }}">Stop Procrastination</a>
+  <nav>
+    <a href="{{ url_for('index') }}">Plan</a>
+    <a href="{{ url_for('timer') }}">Focus</a>
+    {% if current_user %}
+      <span class="who">{{ current_user }}</span>
+      <form method="post" action="{{ url_for('logout') }}">
+        <button type="submit" class="text-button">Log out</button>
+      </form>
+    {% else %}
+      <a href="{{ url_for('login') }}">Log in</a>
+    {% endif %}
+  </nav>
+</header>

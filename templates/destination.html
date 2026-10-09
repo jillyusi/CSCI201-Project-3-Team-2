@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
+    {% include "_nav.html" %}
     <main class="page">
       <article class="panel plan-card">
         <p class="eyebrow">Your plan</p>
@@ -49,7 +50,11 @@
         </figure>
         {% endif %}
 
+        {% if saved %}
+          <p class="hint saved-note">Saved to {{ current_user }}'s profile.</p>
+        {% endif %}
         <div class="actions">
+          <a href="{{ url_for('timer') }}" class="back-link">Focus on this task</a>
           <a href="/" class="back-link">Start a New Task</a>
         </div>
       </article>

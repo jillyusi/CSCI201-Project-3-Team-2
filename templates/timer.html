@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-name="{{ current_user or '' }}">
+  {% include "_nav.html" %}
+  <main class="page timer-page">
+    <p class="eyebrow">Focus</p>
+    <h1>Stay with the task</h1>
+    <p class="lede">Set a work stretch and the breaks inside it. The session ends when the last work block ends.</p>
+
+    <div class="timer-layout">
+      <section class="panel timer-stage">
+        <label class="animation-toggle">
+          <input type="checkbox" id="show-animation" checked>
+          Show the table animation
+        </label>
+        <div class="scene is-idle" id="scene" aria-hidden="true">
+          <div class="tt-table"><div class="tt-net"></div></div>
+          <div class="tt-shadow" id="tt-shadow"></div>
+          <div class="tt-ball" id="tt-ball"></div>
+          <div class="tt-paddle left" id="tt-left"></div>
+          <div class="tt-paddle right" id="tt-right"></div>
+        </div>
+        <p class="phase" id="phase">Ready</p>
+        <p class="clock" id="clock">25:00</p>
+        <p class="encourage" id="encourage" aria-live="polite">
+          {% if current_user %}Ready when you are, {{ current_user }}.{% else %}Ready when you are.{% endif %}
+        </p>
+        <p class="schedule" id="schedule"></p>
+        <div class="timer-controls">
+          <button type="button" id="start" class="submit">Start</button>
+          <button type="button" id="pause" class="ghost-button" hidden>Pause</button>
+          <button type="button" id="end" class="ghost-button" hidden>Finish</button>
+        </div>
+      </section>
+
+      <form id="timer-setup" class="panel">
+        <h2>This session</h2>
+        {% if tasks %}
+          <div class="field">
+            <label for="saved-task">Use a saved task</label>
+            <select id="saved-task" class="form-control">
+              <option value="">Choose one</option>
+              {% for task in tasks %}
+                <option value="{{ task.description }}">{{ (task.title or task.description)[:70] }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        {% elif not current_user %}
+          <p class="hint">Log in and your plans will show up here, and the lines will use your name and past tasks.</p>
+        {% endif %}
+
+        <div class="field">
+          <label for="focus-task">What are you working on?</label>
+          <textarea id="focus-task" class="form-control" rows="3" required>{{ prefill }}</textarea>
+        </div>
+
+        <fieldset class="field mode-switch">
+          <legend>Breaks</legend>
+          <label class="mode-option">
+            <input type="radio" name="mode" value="interval" checked>
+            Repeating intervals
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="mode" value="custom">
+            Breaks at chosen times
+          </label>
+        </fieldset>
+
+        <div id="interval-fields">
+          <div class="split-fields">
+            <div class="field">
+              <label for="focus-minutes">Focus minutes</label>
+              <input id="focus-minutes" class="form-control" type="number" min="1" max="180" value="25">
+            </div>
+            <div class="field">
+              <label for="break-minutes">Break minutes</label>
+              <input id="break-minutes" class="form-control" type="number" min="1" max="60" value="5">
+            </div>
+          </div>
+          <div class="split-fields">
+            <div class="field">
+              <label for="rounds">Focus rounds</label>
+              <input id="rounds" class="form-control" type="number" min="1" max="12" value="4">
+            </div>
+            <div class="field">
+              <label for="long-every">Long break every</label>
+              <input id="long-every" class="form-control" type="number" min="0" max="12" value="4">
+            </div>
+          </div>
+          <div class="field">
+            <label for="long-minutes">Long break minutes</label>
+            <p class="hint">Use 0 in "long break every" if you only want the short break.</p>
+            <input id="long-minutes" class="form-control" type="number" min="1" max="60" value="15">
+          </div>
+        </div>
+
+        <div id="custom-fields" hidden>
+          <div class="field">
+            <label for="total-work">Total minutes of work</label>
+            <input id="total-work" class="form-control" type="number" min="1" max="240" value="50">
+          </div>
+          <div id="break-rows"></div>
+          <button type="button" id="add-break" class="ghost-button">Add a break</button>
+          <p class="hint">"After 25 minutes" means 25 minutes of work, not counting rest.</p>
+        </div>
+
+        <p class="form-error" id="timer-error" hidden></p>
+      </form>
+    </div>
+  </main>
+  <script src="{{ url_for('static', filename='timer.js') }}"></script>
+</body>
+</html>
