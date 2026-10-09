@@ -6,84 +6,104 @@
   <title>Stop Procrastination</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .step { display: none; animation: fadeIn 0.4s ease-in-out; }
+    .step.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; font-family: "Fraunces", serif; font-size: 1.5rem; color: var(--ink); }
+  </style>
 </head>
 <body>
-  {% include "_nav.html" %}
-  <main class="page">
-    <p class="eyebrow">{% if current_user %}Hello, {{ current_user }}{% else %}A calmer way to start{% endif %}</p>
-    <h1>Stop Procrastination</h1>
-    <p class="lede">Tell the truth about the task you keep putting off. We'll turn that into a plan small enough to begin.</p>
-    <p class="cross-link"><a href="{{ url_for('timer') }}">Or start a focus timer</a></p>
 
-    <form method="post" action="#" class="panel">
-      <div class="field">
-        <label for="task-description">Describe your task and the avoidance</label>
-        <p class="hint">Be as honest as you can. You don't need to make your answer sound productive or reasonable.</p>
-        <textarea
-          id="task-description"
-          name="task-description"
-          rows="4"
-          class="form-control"
-          placeholder="I've been avoiding [specific task] for [how long]..."
-          required></textarea>
-      </div>
+  <div id="loading-overlay">
+    <div>Designing your plan...</div>
+  </div>
 
-      <div class="field">
-        <label for="end-date">By what date would you like your task to be done by?</label>
-        <input type="date" id="end-date" name="end-date" class="form-control" required>
-      </div>
+  <div class="page">
+    <header style="margin-bottom: 2rem;">
+      <p class="eyebrow">Productivity Coach</p>
+      <h1>Stop Procrastination</h1>
+      <p class="lede">A tool to help you get started when you feel completely stuck.</p>
+    </header>
 
-      <div class="field">
-        <p class="field-label">What do you think your procrastination might be coming from?</p>
-        <p class="hint">Check all that apply. It's okay if you're not completely sure.</p>
+    <div class="panel">
+      <form id="task-form" method="post" action="/plan">
+        
+        <!-- Step 1 -->
+        <div class="step active" id="step-1">
+          <h2>What's on your mind?</h2>
+          <div class="field">
+            <label for="task-description">Describe the task you've been avoiding.</label>
+            <p class="hint">Be honest—you don't need to sound productive here.</p>
+            <textarea id="task-description" name="task-description" rows="4" class="form-control" style="width: 100%;" required></textarea>
+          </div>
+          
+          <div class="field" style="margin-top: 1.5rem;">
+            <label>How do you need me to talk to you today?</label>
+            <div class="choices" style="margin-top: 0.5rem;">
+              <label class="form-check">
+                <input type="radio" class="form-check-input" name="coach_tone" value="Gentle, empathetic, and softly encouraging" checked>
+                Gentle & Empathetic
+              </label>
+              <label class="form-check">
+                <input type="radio" class="form-check-input" name="coach_tone" value="Direct, no-nonsense, tough love, highly structured">
+                Direct & Tough Love
+              </label>
+              <label class="form-check">
+                <input type="radio" class="form-check-input" name="coach_tone" value="High energy, enthusiastic, ultimate hype-man">
+                Hype-Man
+              </label>
+            </div>
+          </div>
 
-        <div class="choices">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="anxiety" name="procrastination_reason" value="Anxiety">
-            <label class="form-check-label" for="anxiety">Anxiety</label>
+          <button type="button" class="submit next-btn">Next &rarr;</button>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step" id="step-2">
+          <h2>Identify the feeling</h2>
+          <div class="field">
+            <label for="user_feeling">Where do you think this procrastination is coming from?</label>
+            <p class="hint">e.g., I feel overwhelmed, or I'm worried it won't be perfect...</p>
+            <textarea id="user_feeling" name="user_feeling" rows="5" class="form-control" style="width: 100%;" required></textarea>
           </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="fear_failure" name="procrastination_reason" value="Fear of Failure">
-            <label class="form-check-label" for="fear_failure">Fear of Failure</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="resentment" name="procrastination_reason" value="Resentment">
-            <label class="form-check-label" for="resentment">Resentment</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="uncertainty" name="procrastination_reason" value="Uncertainty">
-            <label class="form-check-label" for="uncertainty">Uncertainty / I don't know where to start</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="overwhelmed" name="procrastination_reason" value="Overwhelmed">
-            <label class="form-check-label" for="overwhelmed">Feeling Overwhelmed</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="something_else" name="procrastination_reason" value="Something Else">
-            <label class="form-check-label" for="something_else">Something Else</label>
+          
+          <div class="actions">
+            <button type="button" class="ghost-button prev-btn" style="margin-top: 0.4rem; padding: 0.85rem 1rem;">&larr; Back</button>
+            <button id="start-task" type="submit" class="submit" style="flex: 1;">Generate Plan</button>
           </div>
         </div>
-      </div>
+      </form>
+    </div>
+  </div>
 
-      <div class="field">
-        <label for="reflection">Before we make a plan...</label>
-        <p class="hint">Don't worry about figuring out how to fix it yet. Just tell us what you think is really going on.</p>
-        <textarea
-          id="reflection"
-          name="reflection"
-          rows="3"
-          class="form-control"
-          placeholder="What do you think the real reason you're avoiding this is?"></textarea>
-      </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const steps = document.querySelectorAll(".step");
+      let currentStep = 0;
 
-      <button id="start-task" type="submit" class="submit">Help Me Understand My Procrastination</button>
-      {% if not current_user %}
-        <p class="hint stay-note">Log in if you want this task saved to a profile.</p>
-      {% endif %}
-    </form>
-  </main>
+      function updateUI() {
+        steps.forEach((step, index) => step.classList.toggle("active", index === currentStep));
+      }
+
+      document.querySelectorAll(".next-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const currentInput = steps[currentStep].querySelector('input[required], textarea[required]');
+          if (currentInput && !currentInput.value) return currentInput.reportValidity();
+          if (currentStep < steps.length - 1) { currentStep++; updateUI(); }
+        });
+      });
+
+      document.querySelectorAll(".prev-btn").forEach(btn => {
+        btn.addEventListener("click", () => { if (currentStep > 0) { currentStep--; updateUI(); } });
+      });
+
+      document.getElementById('task-form').addEventListener('submit', () => {
+        document.getElementById('loading-overlay').style.display = 'flex';
+      });
+    });
+  </script>
 </body>
 </html>

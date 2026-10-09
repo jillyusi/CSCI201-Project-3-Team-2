@@ -6,58 +6,177 @@
     <title>Your Action Plan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+      .revise-panel { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--line); }
+      .step-wrapper { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
+      .step-wrapper:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    </style>
   </head>
   <body>
-    {% include "_nav.html" %}
-    <main class="page">
-      <article class="panel plan-card">
-        <p class="eyebrow">Your plan</p>
-        <h1 class="plan-title">{{ data['title'] }}</h1>
+    
+    <header class="site-nav">
+      <div class="brand">Stop Procrastination</div>
+      <a href="/" class="text-button">Start Over</a>
+    </header>
 
-        <div class="advice">
-          {% set ns = namespace(list_open=false, list_kind='') %}
-          {% for line in data['advice'].replace('\r\n', '\n').replace('\\n', '\n').split('\n') %}
-            {% set stripped = line.strip() %}
-            {% set head = stripped.split(' ', 1)[0] if stripped else '' %}
-            {% set is_bullet = stripped.startswith('- ') or stripped.startswith('* ') or stripped.startswith('• ') %}
-            {% set is_numbered = head|length > 1 and head[:-1].isdigit() and head[-1] in '. )' %}
-            {% if is_bullet or is_numbered %}
-              {% if not ns.list_open %}
-                {% if is_numbered %}<ol>{% else %}<ul>{% endif %}
-                {% set ns.list_open = true %}
-                {% set ns.list_kind = 'ol' if is_numbered else 'ul' %}
-              {% endif %}
-              <li>{{ stripped.split(' ', 1)[1] }}</li>
-            {% else %}
-              {% if ns.list_open %}
-                {% if ns.list_kind == 'ol' %}</ol>{% else %}</ul>{% endif %}
-                {% set ns.list_open = false %}
-              {% endif %}
-              {% if stripped %}<p>{{ stripped }}</p>{% endif %}
-            {% endif %}
-          {% endfor %}
-          {% if ns.list_open %}
-            {% if ns.list_kind == 'ol' %}</ol>{% else %}</ul>{% endif %}
-          {% endif %}
+    <div class="page timer-page">
+      <div class="timer-layout">
+        
+        <!-- Column 1: Timer UI (Required by timer.js) -->
+        <div class="timer-section">
+          <div id="scene" class="scene">
+            <div class="tt-table"></div>
+            <div class="tt-net"></div>
+            <div id="tt-left" class="tt-paddle left"></div>
+            <div id="tt-right" class="tt-paddle right"></div>
+            <div id="tt-shadow" class="tt-shadow"></div>
+            <div id="tt-ball" class="tt-ball"></div>
+          </div>
+          
+          <div>
+            <label class="animation-toggle"><input type="checkbox" id="show-animation" checked> Show animation</label>
+          </div>
+
+          <div class="timer-stage panel" style="margin-top: 0.5rem;">
+            <p id="phase" class="phase">Focus</p>
+            <p id="clock" class="clock">25:00</p>
+            <p id="encourage" class="encourage"></p>
+            <p id="schedule" class="schedule"></p>
+            <p id="timer-error" class="form-error" hidden></p>
+
+            <div class="timer-controls">
+              <button id="start" class="submit">Start</button>
+              <button id="pause" class="ghost-button" hidden>Pause</button>
+              <button id="end" class="ghost-button" hidden>End</button>
+            </div>
+          </div>
+
+          <!-- Timer Setup Form -->
+          <form id="timer-setup" class="panel">
+            <fieldset class="mode-switch">
+              <legend>Timer Mode</legend>
+              <label class="mode-option"><input type="radio" name="mode" value="interval" checked> Pomodoro (Intervals)</label>
+              <label class="mode-option"><input type="radio" name="mode" value="custom"> Custom</label>
+            </fieldset>
+
+            <div id="interval-fields" class="split-fields">
+              <div class="field"><label>Focus (min)</label><input type="number" id="focus-minutes" value="25" class="form-control"></div>
+              <div class="field"><label>Break (min)</label><input type="number" id="break-minutes" value="5" class="form-control"></div>
+              <div class="field"><label>Rounds</label><input type="number" id="rounds" value="4" class="form-control"></div>
+              <div class="field"><label>Long Break Every</label><input type="number" id="long-every" value="4" class="form-control"></div>
+              <div class="field"><label>Long Break (min)</label><input type="number" id="long-minutes" value="15" class="form-control"></div>
+            </div>
+
+            <div id="custom-fields" hidden>
+              <div class="field"><label>Total Work Time (min)</label><input type="number" id="total-work" value="60" class="form-control"></div>
+              <div id="break-rows"></div>
+              <button type="button" id="add-break" class="ghost-button">Add Break</button>
+            </div>
+          </form>
         </div>
 
-        {% if data.get('image') %}
-        <figure class="plan-figure">
-          <img src="{{ data['image'] }}" alt="A small illustration for this plan" />
-        </figure>
-        {% endif %}
+        <!-- Column 2: AI Action Plan UI -->
+        <div class="plan-section">
+          
+          <div class="panel" style="margin-top: 0; background: var(--accent-soft); border-color: var(--accent);">
+            <p class="eyebrow" style="color: var(--accent-dark);">Detected Blocker</p>
+            <p style="margin: 0; font-size: 1.08rem;">{{ data['detected_blocker'] }}</p>
+          </div>
 
-        {% if saved %}
-          <p class="hint saved-note">Saved to {{ current_user }}'s profile.</p>
-        {% endif %}
-        <div class="actions">
-          <a href="{{ url_for('timer') }}" class="back-link">Focus on this task</a>
-          <a href="/" class="back-link">Start a New Task</a>
+          <div class="panel plan-card">
+            <h2 class="plan-title">{{ data['title'] }}</h2>
+            <div class="advice" id="steps-list">
+              
+              <!-- Hidden input to pass task context to the JS timer -->
+              <input type="hidden" id="focus-task" value="{{ data['task_context'] }}">
+
+              {% for step in data['steps'] %}
+              <div class="step-wrapper" data-step-index="{{ loop.index0 }}">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                  <p class="step-text" style="margin: 0; flex: 1;">{{ step }}</p>
+                  <button class="ghost-button toggle-revise-btn" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Too Hard?</button>
+                </div>
+                
+                <div class="revise-panel">
+                  <div class="field" style="margin-bottom: 0.5rem;">
+                    <label style="font-size: 0.9rem;">Why doesn't this work?</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                      <input type="text" class="form-control feedback-input" style="flex: 1; padding: 0.5rem;" placeholder="e.g., Takes too long...">
+                      <button class="submit submit-revision-btn" type="button" style="width: auto; margin: 0; padding: 0.5rem 1rem;">Update</button>
+                    </div>
+                  </div>
+                  <p class="hint revision-status" style="margin: 0;"></p>
+                </div>
+              </div>
+              {% endfor %}
+
+            </div>
+          </div>
         </div>
-      </article>
-    </main>
+
+      </div>
+    </div>
+
+    <div id="page-data"
+      hidden
+      data-task-context='{{ data['task_context'] | tojson | safe }}'
+      data-coach-tone='{{ data['coach_tone'] | tojson | safe }}'>
+    </div>
+
+    <script src="{{ url_for('static', filename='timer.js') }}"></script>
+    <script>
+      const pageData = document.getElementById('page-data');
+      const taskContext = JSON.parse(pageData.dataset.taskContext);
+      const coachTone = JSON.parse(pageData.dataset.coachTone);
+      
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.step-wrapper').forEach(card => {
+          const toggleBtn = card.querySelector('.toggle-revise-btn');
+          const revisePanel = card.querySelector('.revise-panel');
+          const submitBtn = card.querySelector('.submit-revision-btn');
+          const stepTextEl = card.querySelector('.step-text');
+          const feedbackInput = card.querySelector('.feedback-input');
+          const statusText = card.querySelector('.revision-status');
+
+          toggleBtn.addEventListener('click', () => {
+            revisePanel.style.display = revisePanel.style.display === 'block' ? 'none' : 'block';
+          });
+
+          submitBtn.addEventListener('click', async () => {
+            const feedback = feedbackInput.value.trim();
+            const originalStep = stepTextEl.innerText;
+            if (!feedback) return;
+
+            statusText.innerText = 'Generating...';
+            submitBtn.disabled = true;
+
+            try {
+              const response = await fetch('/api/revise', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ step: originalStep, feedback: feedback, task_context: taskContext, coach_tone: coachTone })
+              });
+              
+              const data = await response.json();
+              
+              stepTextEl.style.opacity = 0;
+              setTimeout(() => {
+                stepTextEl.innerText = data.revised_step;
+                stepTextEl.style.opacity = 1;
+              }, 300);
+              
+              feedbackInput.value = "";
+              setTimeout(() => { revisePanel.style.display = 'none'; statusText.innerText = ""; }, 1500);
+            } catch (error) {
+              statusText.innerText = "Error. Try again.";
+            } finally {
+              submitBtn.disabled = false;
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>
