@@ -38,7 +38,12 @@ def index():
                         
                         Please provide a JSON response with the following format: 
                         {{"title": "<A catchy, motivational title for their action plan>", 
-                        "advice": "<Provide an empathetic, personalized, and actionable step-by-step plan to overcome this specific procrastination in about 150 words>"}}
+                        "advice": "<An empathetic, personalized plan in about 150 words>"}}
+
+                        Format "advice" as plain text with real line breaks.
+                        Start with one or two sentences of empathy.
+                        Then put each action step on its own line, starting with "- ".
+                        Do not put the steps in one paragraph, and do not use HTML.
                     """
                 }
             ]

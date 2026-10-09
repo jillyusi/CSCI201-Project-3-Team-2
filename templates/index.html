@@ -4,111 +4,81 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Stop Procrastination</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    /* Centers and constrains the form for better readability on desktop */
-    .form-container {
-      max-width: 650px;
-      margin: auto;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="bg-light">
+<body>
+  <main class="page">
+    <p class="eyebrow">A calmer way to start</p>
+    <h1>Stop Procrastination</h1>
+    <p class="lede">Tell the truth about the task you keep putting off. We'll turn that into a plan small enough to begin.</p>
 
-  <div class="container mt-5 mb-5 form-container">
-    <h2 class="text-center mb-4">Stop Procrastination</h2>
-    
-    <form method="post" action="#" class="p-4 bg-white rounded shadow-sm">
-      
-
-      <!-- Task Description -->
-      <div class="form-group mb-4">
-        <label for="task-description">
-          <strong>Describe your task and the avoidance:</strong>
-        </label>
-        <p class="text-muted small mb-2">
-          Be as honest as you can. You don't need to make your answer sound productive or reasonable.
-        </p>
-        <textarea 
-          id="task-description" 
-          name="task-description" 
-          rows="4" 
-          class="form-control" 
-          placeholder="I've been avoiding [specific task] for [how long]..." 
+    <form method="post" action="#" class="panel">
+      <div class="field">
+        <label for="task-description">Describe your task and the avoidance</label>
+        <p class="hint">Be as honest as you can. You don't need to make your answer sound productive or reasonable.</p>
+        <textarea
+          id="task-description"
+          name="task-description"
+          rows="4"
+          class="form-control"
+          placeholder="I've been avoiding [specific task] for [how long]..."
           required></textarea>
       </div>
 
-      <!-- Date Input -->
-      <div class="form-group mb-4">
-        <label for="end-date">
-          <strong>By what date would you like your task to be done by?</strong>
-        </label>
+      <div class="field">
+        <label for="end-date">By what date would you like your task to be done by?</label>
         <input type="date" id="end-date" name="end-date" class="form-control" required>
       </div>
 
-      <!-- Procrastination Reasons -->
-      <div class="form-group mb-4">
-        <label>
-          <strong>What do you think your procrastination might be coming from?</strong>
-        </label>
-        <p class="text-muted small mb-2">
-          Check all that apply. It's okay if you're not completely sure.
-        </p>
-        
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="anxiety" name="procrastination_reason" value="Anxiety">
-          <label class="form-check-label" for="anxiety">Anxiety</label>
-        </div>
-        
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="fear_failure" name="procrastination_reason" value="Fear of Failure">
-          <label class="form-check-label" for="fear_failure">Fear of Failure</label>
-        </div>
-        
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="resentment" name="procrastination_reason" value="Resentment">
-          <label class="form-check-label" for="resentment">Resentment</label>
-        </div>
-        
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="uncertainty" name="procrastination_reason" value="Uncertainty">
-          <label class="form-check-label" for="uncertainty">Uncertainty / I don't know where to start</label>
-        </div>
-        
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="overwhelmed" name="procrastination_reason" value="Overwhelmed">
-          <label class="form-check-label" for="overwhelmed">Feeling Overwhelmed</label>
-        </div>
-        
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="something_else" name="procrastination_reason" value="Something Else">
-          <label class="form-check-label" for="something_else">Something Else</label>
+      <div class="field">
+        <p class="field-label">What do you think your procrastination might be coming from?</p>
+        <p class="hint">Check all that apply. It's okay if you're not completely sure.</p>
+
+        <div class="choices">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="anxiety" name="procrastination_reason" value="Anxiety">
+            <label class="form-check-label" for="anxiety">Anxiety</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="fear_failure" name="procrastination_reason" value="Fear of Failure">
+            <label class="form-check-label" for="fear_failure">Fear of Failure</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="resentment" name="procrastination_reason" value="Resentment">
+            <label class="form-check-label" for="resentment">Resentment</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="uncertainty" name="procrastination_reason" value="Uncertainty">
+            <label class="form-check-label" for="uncertainty">Uncertainty / I don't know where to start</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="overwhelmed" name="procrastination_reason" value="Overwhelmed">
+            <label class="form-check-label" for="overwhelmed">Feeling Overwhelmed</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="something_else" name="procrastination_reason" value="Something Else">
+            <label class="form-check-label" for="something_else">Something Else</label>
+          </div>
         </div>
       </div>
 
-      <!-- Reflection -->
-      <div class="form-group mb-4">
-        <label for="reflection">
-          <strong>Before we make a plan...</strong>
-        </label>
-        <p class="text-muted small mb-2">
-          Don't worry about figuring out how to fix it yet. Just tell us what you think is really going on.
-        </p>
-        <textarea 
-          id="reflection" 
-          name="reflection" 
-          rows="3" 
-          class="form-control" 
+      <div class="field">
+        <label for="reflection">Before we make a plan...</label>
+        <p class="hint">Don't worry about figuring out how to fix it yet. Just tell us what you think is really going on.</p>
+        <textarea
+          id="reflection"
+          name="reflection"
+          rows="3"
+          class="form-control"
           placeholder="What do you think the real reason you're avoiding this is?"></textarea>
       </div>
 
-      <!-- Submit -->
-      <button id="start-task" type="submit" class="btn btn-primary btn-block py-2 mt-4">
-        Help Me Understand My Procrastination
-      </button>
-      
+      <button id="start-task" type="submit" class="submit">Help Me Understand My Procrastination</button>
     </form>
-  </div>
-
+  </main>
 </body>
 </html>
